@@ -994,7 +994,8 @@ fn client_lens_run() {
             arguments: Some(vec![json!({
                 "args": [ "test", "--", "--nocapture", "test_foo" ],
                 "binary": "cargo",
-                "env": { "RUST_BACKTRACE": "short" }
+                "env": { "RUST_BACKTRACE": "short" },
+                "cwd": p.root().join("src")
             })]),
         }),
         data: None,

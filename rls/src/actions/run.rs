@@ -67,6 +67,7 @@ pub fn collect_run_actions(ctx: &InitActionContext, file: &Path) -> Vec<RunActio
                     test_name.to_string(),
                 ],
                 env: iter::once(("RUST_BACKTRACE".to_string(), "short".to_string())).collect(),
+                cwd: file.parent().and_then(|dir| dir.to_str()).map(String::from),
             },
         };
         ret.push(run_action);
@@ -85,6 +86,7 @@ pub struct Cmd {
     pub binary: String,
     pub args: Vec<String>,
     pub env: HashMap<String, String>,
+    pub cwd: Option<String>,
 }
 
 pub struct LineIndex {
