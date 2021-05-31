@@ -354,3 +354,86 @@ fn test_wide_utf16() {
 
     assert_eq!(vfs.load_file(&Path::new("foo")).unwrap(), FileContents::Text("".to_owned()),);
 }
+
+#[test]
+fn test_load_span() {
+    let vfs = VfsInternal::<MockFileLoader, ()>::new();
+    let changes = [Change::AddFile {
+        file: PathBuf::from("foo"),
+        text: String::from("hello\nfrom\nthe\nother\nside"),
+    }];
+
+    vfs.on_changes(&changes).unwrap();
+
+    assert_eq!(
+        vfs.load_span(Span::from_positions(
+            Position::new(Row::new_zero_indexed(0), Column::new_zero_indexed(0)),
+            Position::new(Row::new_zero_indexed(4), Column::new_zero_indexed(3)),
+            "foo",
+        ),)
+            .unwrap(),
+        "hello\nfrom\nthe\nother\nside"
+    );
+
+    assert_eq!(
+        vfs.load_span(Span::from_positions(
+            Position::new(Row::new_zero_indexed(0), Column::new_zero_indexed(2)),
+            Position::new(Row::new_zero_indexed(4), Column::new_zero_indexed(2)),
+            "foo",
+        ),)
+            .unwrap(),
+        "llo\nfrom\nthe\nother\nsid"
+    );
+
+    assert_eq!(
+        vfs.load_span(Span::from_positions(
+            Position::new(Row::new_zero_indexed(2), Column::new_zero_indexed(1)),
+            Position::new(Row::new_zero_indexed(2), Column::new_zero_indexed(2)),
+            "foo",
+        ),)
+            .unwrap(),
+        "he"
+    );
+}
+
+#[test]
+fn test_load_lines() {
+    let vfs = VfsInternal::<MockFileLoader, ()>::new();
+    let changes = [Change::AddFile {
+        file: PathBuf::from("foo"),
+        text: String::from("hello\nfrom\nthe\nother\nside"),
+    }];
+
+    vfs.on_changes(&changes).unwrap();
+
+    assert_eq!(
+        vfs.load_lines(&PathBuf::from("foo"), Row::new_zero_indexed(0), Row::new_zero_indexed(0))
+            .unwrap(),
+        "hello\n"
+    );
+    assert_eq!(
+        vfs.load_lines(&PathBuf::from("foo"), Row::new_zero_indexed(0), Row::new_zero_indexed(4))
+            .unwrap(),
+        "hello\nfrom\nthe\nother\nside"
+    );
+    assert_eq!(
+        vfs.load_lines(&PathBuf::from("foo"), Row::new_zero_indexed(2), Row::new_zero_indexed(4))
+            .unwrap(),
+        "the\nother\nside"
+    );
+}
+
+#[test]
+fn test_load_line() {
+    let vfs = VfsInternal::<MockFileLoader, ()>::new();
+    let changes = [Change::AddFile {
+        file: PathBuf::from("foo"),
+        text: String::from("hello\nfrom\nthe\nother\nside"),
+    }];
+
+    vfs.on_changes(&changes).unwrap();
+
+    assert_eq!(vfs.load_line(&PathBuf::from("foo"), Row::new_zero_indexed(0)).unwrap(), "hello\n");
+    assert_eq!(vfs.load_line(&PathBuf::from("foo"), Row::new_zero_indexed(2)).unwrap(), "the\n");
+    assert_eq!(vfs.load_line(&PathBuf::from("foo"), Row::new_zero_indexed(4)).unwrap(), "side");
+}

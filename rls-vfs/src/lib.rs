@@ -754,14 +754,7 @@ impl TextFile {
     }
 
     fn load_line(&self, line: span::Row<span::ZeroIndexed>) -> Result<&str, Error> {
-        let start = *try_opt_loc!(self.line_indices.get(line.0 as usize));
-        let end = *try_opt_loc!(self.line_indices.get(line.0 as usize + 1));
-
-        if (end as usize) <= self.text.len() && start <= end {
-            Ok(&self.text[start as usize..end as usize])
-        } else {
-            Err(Error::BadLocation)
-        }
+        self.load_lines(line, line)
     }
 
     fn load_lines(
@@ -770,7 +763,7 @@ impl TextFile {
         line_end: span::Row<span::ZeroIndexed>,
     ) -> Result<&str, Error> {
         let line_start = line_start.0 as usize;
-        let mut line_end = line_end.0 as usize;
+        let mut line_end = line_end.0 as usize + 1;
         if line_end >= self.line_indices.len() {
             line_end = self.line_indices.len() - 1;
         }
@@ -795,7 +788,7 @@ impl TextFile {
         let start = (*try_opt_loc!(self.line_indices.get(line_start))) as usize;
         let start = start + range.col_start.0 as usize;
         let end = (*try_opt_loc!(self.line_indices.get(line_end))) as usize;
-        let end = end + range.col_end.0 as usize;
+        let end = end + range.col_end.0 as usize + 1;
 
         if (end) <= self.text.len() && start <= end {
             Ok(&self.text[start..end])
