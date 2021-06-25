@@ -23,7 +23,7 @@ pub fn collect_run_actions(ctx: &InitActionContext, file: &Path) -> Vec<RunActio
     }
 
     lazy_static! {
-        /// __(a):__ `\#\[test\]` matches `#[test]`
+        /// __(a):__ `\#\[([\w]+::)*test\]` matches `#[test]`, `#[async_executor::test]` or `#[async_lib::module::test]`.
         ///
         /// __(b):__ `^[^\/]*?fn\s+(?P<name>\w+)` matches any line which contains `fn name` before any comment is started and captures the word after fn.
         /// The laziness of the quantifier is there to make the regex quicker (about 5 times less steps)
@@ -42,7 +42,7 @@ pub fn collect_run_actions(ctx: &InitActionContext, file: &Path) -> Vec<RunActio
         /// fn right_function() {}
         /// ```
         static ref TEST_FN_RE: Regex =
-            Regex::new(r"(?m)#\[test\](\n|.)*?^[^/]*?fn\s+(?P<name>\w+)").unwrap();
+            Regex::new(r"(?m)#\[([\w]+::)*test\](\n|.)*?^[^/]*?fn\s+(?P<name>\w+)").unwrap();
     }
 
     let line_index = LineIndex::new(&text);

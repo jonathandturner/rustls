@@ -987,24 +987,42 @@ fn client_lens_run() {
         },
     );
 
-    let expected = CodeLens {
-        command: Some(Command {
-            command: "rls.run".to_string(),
-            title: "Run test".to_string(),
-            arguments: Some(vec![json!({
-                "args": [ "test", "--", "--nocapture", "test_foo" ],
-                "binary": "cargo",
-                "env": { "RUST_BACKTRACE": "short" }
-            })]),
-        }),
-        data: None,
-        range: Range {
-            start: Position { line: 4, character: 3 },
-            end: Position { line: 4, character: 11 },
+    let expected = vec![
+        CodeLens {
+            command: Some(Command {
+                command: "rls.run".to_string(),
+                title: "Run test".to_string(),
+                arguments: Some(vec![json!({
+                    "args": [ "test", "--", "--nocapture", "test_foo" ],
+                    "binary": "cargo",
+                    "env": { "RUST_BACKTRACE": "short" }
+                })]),
+            }),
+            data: None,
+            range: Range {
+                start: Position { line: 4, character: 3 },
+                end: Position { line: 4, character: 11 },
+            },
         },
-    };
+        CodeLens {
+            command: Some(Command {
+                command: "rls.run".to_string(),
+                title: "Run test".to_string(),
+                arguments: Some(vec![json!({
+                    "args": [ "test", "--", "--nocapture", "test_bar"],
+                    "binary": "cargo",
+                    "env": { "RUST_BACKTRACE": "short" }
+                })]),
+            }),
+            data: None,
+            range: Range {
+                start: Position { line: 9, character: 3 },
+                end: Position { line: 9, character: 11 },
+            },
+        },
+    ];
 
-    assert_eq!(lens, Some(vec![expected]));
+    assert_eq!(lens, Some(expected));
 }
 
 #[test]
