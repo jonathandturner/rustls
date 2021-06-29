@@ -66,15 +66,16 @@ impl Project {
     }
 
     pub fn spawn_rls_async(&self) -> RlsHandle<ChildProcess> {
-        let rt = tokio::runtime::Builder::new()
-            .basic_scheduler()
+        let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
-            .core_threads(1)
+            // .worker_threads(1)
             .build()
             .unwrap();
 
         let cmd = self.rls_cmd();
-        let process = rt.enter(|| ChildProcess::spawn_from_command(cmd).unwrap());
+        let guard = rt.enter();
+        let process = ChildProcess::spawn_from_command(cmd).unwrap();
+        drop(guard);
         self.spawn_rls_with_params(rt, process)
     }
 
@@ -97,7 +98,7 @@ impl Project {
         #[allow(clippy::unit_arg)] // We're interested in the side-effects of `process_msg`.
         local_set.spawn_local(async move {
             use futures::TryStreamExt;
-            use tokio::stream::StreamExt;
+            use tokio_stream::StreamExt;
 
             stream
                 .timeout(rls_timeout())
@@ -178,7 +179,7 @@ impl<T: AsyncRead + AsyncWrite> RlsHandle<T> {
     }
 
     /// Block on returned, associated future with a timeout.
-    pub fn block_on<F: Future>(&mut self, f: F) -> Result<F::Output, tokio::time::Elapsed> {
+    pub fn block_on<F: Future>(&mut self, f: F) -> Result<F::Output, tokio::time::error::Elapsed> {
         self.local_set
             .block_on(&mut self.runtime, async { tokio::time::timeout(rls_timeout(), f).await })
     }

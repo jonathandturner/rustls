@@ -20,6 +20,13 @@ name = "rls"
 test = false
 path = "rls/src/main.rs"
 
+[patch.crates-io]
+parity-tokio-ipc = { git = "https://github.com/Xanewok/parity-tokio-ipc", branch = "mio-07" }
+jsonrpc-core = { git = "https://github.com/paritytech/jsonrpc", branch = "igor-tokio-1.0" }
+jsonrpc-core-client = { git = "https://github.com/paritytech/jsonrpc", branch = "igor-tokio-1.0" }
+jsonrpc-derive = { git = "https://github.com/paritytech/jsonrpc", branch = "igor-tokio-1.0" }
+jsonrpc-ipc-server = { git = "https://github.com/paritytech/jsonrpc", branch = "igor-tokio-1.0" }
+
 [dependencies]
 # FIXME: Release rls-analysis 0.18.2 to crates.io
 rls-analysis = { version = "0.18.2", path = "rls-analysis" }
@@ -68,9 +75,10 @@ rustc-workspace-hack = "1.0.0"
 [dev-dependencies]
 difference = "2"
 tempfile = "3"
-lsp-codec = "0.2"
-tokio = { version = "0.2", default-features = false, features = ["rt-core", "time", "io-util", "process", "rt-util"] }
-tokio-util = { version = "0.3", default-features = false, features = ["codec"] }
+lsp-codec = "0.3"
+tokio = { version = "1", default-features = false, features = ["rt", "time", "io-util", "process"] }
+tokio-util = { version = "0.6", default-features = false, features = ["codec"] }
+tokio-stream = "0.1"
 futures = "0.3"
 
 [build-dependencies]

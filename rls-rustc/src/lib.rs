@@ -27,7 +27,7 @@ mod ipc;
 
 pub fn run() -> Result<(), ()> {
     #[cfg(feature = "ipc")]
-    let mut rt = tokio::runtime::Runtime::new().unwrap();
+    let rt = tokio::runtime::Runtime::new().unwrap();
     #[cfg(feature = "clippy")]
     let clippy_preference = clippy::preference();
 

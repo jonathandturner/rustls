@@ -4,7 +4,7 @@ use std::process::{Command, Stdio};
 use std::rc::Rc;
 use std::task::{Context, Poll};
 
-use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 
 pub struct ChildProcess {
     stdin: tokio::process::ChildStdin,
@@ -16,8 +16,8 @@ impl AsyncRead for ChildProcess {
     fn poll_read(
         mut self: Pin<&mut Self>,
         cx: &mut Context<'_>,
-        buf: &mut [u8],
-    ) -> Poll<io::Result<usize>> {
+        buf: &mut ReadBuf<'_>,
+    ) -> Poll<io::Result<()>> {
         Pin::new(&mut self.stdout).poll_read(cx, buf)
     }
 }
