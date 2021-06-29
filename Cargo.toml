@@ -20,6 +20,13 @@ name = "rls"
 test = false
 path = "rls/src/main.rs"
 
+[patch.crates-io]
+parity-tokio-ipc = { git = "https://github.com/Xanewok/parity-tokio-ipc", branch = "mio-07" }
+jsonrpc-core = { git = "https://github.com/paritytech/jsonrpc", branch = "igor-tokio-1.0" }
+jsonrpc-core-client = { git = "https://github.com/paritytech/jsonrpc", branch = "igor-tokio-1.0" }
+jsonrpc-derive = { git = "https://github.com/paritytech/jsonrpc", branch = "igor-tokio-1.0" }
+jsonrpc-ipc-server = { git = "https://github.com/paritytech/jsonrpc", branch = "igor-tokio-1.0" }
+
 [dependencies]
 # FIXME: Release rls-analysis 0.18.2 to crates.io
 rls-analysis = { version = "0.18.2", path = "rls-analysis" }
