@@ -2147,7 +2147,7 @@ fn client_fail_uninitialized_request() {
         },
     );
 
-    rls.block_on(async { tokio::time::delay_for(Duration::from_secs(1)).await }).unwrap();
+    rls.block_on(async { tokio::time::sleep(Duration::from_secs(1)).await }).unwrap();
 
     let err = jsonrpc_core::Failure::deserialize(rls.messages().last().unwrap()).unwrap();
     assert_eq!(err.id, jsonrpc_core::Id::Num(ID));
