@@ -175,7 +175,11 @@ fn format_notes(children: &[AssociatedMessage], primary: &DiagnosticSpan) -> Opt
         } else if spans.len() == 1 && spans[0].is_within(primary) {
             add_message_to_notes!(message);
             if let Some(ref suggested) = spans[0].suggested_replacement {
-                notes.push_str(&format!(": `{}`", suggested));
+                if !suggested.is_empty() {
+                    // Only show the suggestion when it is non-empty.
+                    // This matches rustc's behavior.
+                    notes.push_str(&format!(": `{}`", suggested));
+                }
             }
         }
     }
