@@ -106,7 +106,7 @@ fn read_file_contents(path: &Path) -> io::Result<String> {
 
 /// Attempts to read and deserialize `Analysis` data from a JSON file at `path`,
 /// returns `Some(data)` on success.
-fn read_crate_data(path: &Path) -> Option<Analysis> {
+pub fn read_crate_data(path: &Path) -> Option<Analysis> {
     trace!("read_crate_data {:?}", path);
     let t = Instant::now();
 
@@ -116,10 +116,24 @@ fn read_crate_data(path: &Path) -> Option<Analysis> {
             Err(err)
         })
         .ok()?;
-    let s = ::serde_json::from_str(&buf)
+    let s = deserialize_crate_data(&buf);
+
+    let d = t.elapsed();
+    info!("reading {:?} {}.{:09}s", path, d.as_secs(), d.subsec_nanos());
+
+    s
+}
+
+/// Attempts to deserialize `Analysis` data from file contents, returns
+/// `Some(data)` on success.
+pub fn deserialize_crate_data(buf: &str) -> Option<Analysis> {
+    trace!("deserialize_crate_data <buffer omitted>");
+    let t = Instant::now();
+
+    let s = ::serde_json::from_str(buf)
         .or_else(|err| {
             warn!("deserialisation error: {:?}", err);
-            json::parse(&buf)
+            json::parse(buf)
                 .map(|parsed| {
                     if let json::JsonValue::Object(obj) = parsed {
                         let expected =
@@ -127,16 +141,16 @@ fn read_crate_data(path: &Path) -> Option<Analysis> {
                         let actual = obj.get("version").cloned();
                         if expected != actual {
                             warn!(
-                                "Data file version mismatch; expected {:?} but got {:?}",
+                                "Data version mismatch; expected {:?} but got {:?}",
                                 expected, actual
                             );
                         }
                     } else {
-                        warn!("Data file didn't have a JSON object at the root");
+                        warn!("Data didn't have a JSON object at the root");
                     }
                 })
                 .map_err(|err| {
-                    warn!("Data file was not valid JSON: {:?}", err);
+                    warn!("Data was not valid JSON: {:?}", err);
                 })
                 .ok();
 
@@ -145,7 +159,7 @@ fn read_crate_data(path: &Path) -> Option<Analysis> {
         .ok()?;
 
     let d = t.elapsed();
-    info!("reading {:?} {}.{:09}s", path, d.as_secs(), d.subsec_nanos());
+    info!("deserializing <buffer omitted> {}.{:09}s", d.as_secs(), d.subsec_nanos());
 
     s
 }
